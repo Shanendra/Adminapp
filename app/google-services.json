@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "628212265322",
+    "project_id": "vitsapp-7d2c1",
+    "storage_bucket": "vitsapp-7d2c1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:628212265322:android:3e4b352d606261d0ad7513",
+        "android_client_info": {
+          "package_name": "com.example.admincollegeapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXwS0hZ92Ijtsq9ODsXWnVEPeFZ_VTDek"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
