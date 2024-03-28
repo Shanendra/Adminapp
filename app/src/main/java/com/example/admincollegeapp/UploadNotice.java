@@ -32,18 +32,30 @@ import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+
+
 public class UploadNotice extends AppCompatActivity {
 
+    // Constants
     private static final int REQUEST_CODE_PICK_IMAGE = 1;
 
+    // UI Elements
     private CardView addImage;
     private ImageView noticeImageView;
     private EditText noticeTitle;
+    private Button uploadNoticeBtn;
+
+    // Firebase
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
-    private Button uploadNoticeBtn;
+
+    // Bitmap for image
     private Bitmap bitmap;
+
+    // Progress Dialog
     private ProgressDialog progressDialog;
+
+    // Activity Result Launcher
     private ActivityResultLauncher<Intent> galleryLauncher;
 
     @Override
@@ -51,17 +63,23 @@ public class UploadNotice extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_notice);
 
+        // Firebase Initialization
         databaseReference = FirebaseDatabase.getInstance().getReference().child("Notice");
         storageReference = FirebaseStorage.getInstance().getReference().child("Notice");
+
+        // Progress Dialog Initialization
         progressDialog = new ProgressDialog(this);
 
+        // Initialize UI Elements
         addImage = findViewById(R.id.addimage);
         noticeImageView = findViewById(R.id.noticeImageView);
         noticeTitle = findViewById(R.id.noticeTitle);
         uploadNoticeBtn = findViewById(R.id.uploadNoticeBtn);
 
+        // Upload Notice Button Click Listener
         uploadNoticeBtn.setOnClickListener(v -> uploadNotice());
 
+        // Gallery Launcher Initialization
         galleryLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                 Uri uri = result.getData().getData();
@@ -74,9 +92,11 @@ public class UploadNotice extends AppCompatActivity {
             }
         });
 
+        // Add Image Click Listener
         addImage.setOnClickListener(v -> openGallery());
     }
 
+    // Method to upload notice
     private void uploadNotice() {
         String title = noticeTitle.getText().toString().trim();
         if (title.isEmpty()) {
@@ -107,6 +127,7 @@ public class UploadNotice extends AppCompatActivity {
         });
     }
 
+    // Method to upload notice data
     private void uploadData(String title, String downloadUrl) {
         String uniqueKey = databaseReference.push().getKey();
         if (uniqueKey == null) {
@@ -130,9 +151,19 @@ public class UploadNotice extends AppCompatActivity {
                 });
     }
 
+    // Method to open gallery for image selection
     private void openGallery() {
         Intent pickImage = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         galleryLauncher.launch(pickImage);
     }
 }
+
+
+
+
+
+
+
+
+
 

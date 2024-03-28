@@ -1,4 +1,6 @@
+
 package com.example.admincollegeapp;
+
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -19,9 +21,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -33,27 +33,29 @@ import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+
+
 public class UploadImage extends AppCompatActivity {
 
-
-
+    // UI Elements
     private ImageView galleryImageView;
-    private Spinner  imageCategory;
-    private Button   uploadImage;
-    private CardView  selectImage;
-    private  String category;
-    private ActivityResultLauncher<Intent> galleryLauncher;
+    private Spinner imageCategory;
+    private Button uploadImage;
+    private CardView selectImage;
+
+    // Data
+    private String category;
     private Bitmap bitmap;
 
-
-
-    private ProgressDialog progressDialog;
+    // Firebase
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
 
+    // Progress Dialog
+    private ProgressDialog progressDialog;
 
-
-
+    // Activity Result Launcher
+    private ActivityResultLauncher<Intent> galleryLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,23 +63,24 @@ public class UploadImage extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_upload_image);
 
-
+        // Initialize UI Elements
         selectImage = findViewById(R.id.addGalleryImage);
-        imageCategory= findViewById(R.id.image_category);
-        uploadImage=findViewById(R.id.uploadImageBtn);
-        galleryImageView=findViewById(R.id.galleryImageView);
+        imageCategory = findViewById(R.id.image_category);
+        uploadImage = findViewById(R.id.uploadImageBtn);
+        galleryImageView = findViewById(R.id.galleryImageView);
 
-
+        // Firebase Initialization
         databaseReference = FirebaseDatabase.getInstance().getReference().child("Gallery");
         storageReference = FirebaseStorage.getInstance().getReference().child("Gallery");
 
-
+        // Progress Dialog Initialization
         progressDialog = new ProgressDialog(this);
 
-        String[] items = new String[]{"Select Category","Convocation","VITS ON BEATS","College Fest","HORIZON","Independence Day","Other Event"};
-        imageCategory.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,items));
+        // Spinner Initialization
+        String[] items = new String[]{"Select Category", "Convocation", "VITS ON BEATS", "College Fest", "HORIZON", "Independence Day", "Other Event"};
+        imageCategory.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items));
 
-
+        // Spinner Item Selected Listener
         imageCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -86,38 +89,27 @@ public class UploadImage extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                // Do nothing
             }
         });
 
-
-        uploadImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                 if (bitmap == null){
-                     Toast.makeText(UploadImage.this, "Please Upload Image! ", Toast.LENGTH_SHORT).show();
-                 } else if (category.equals("Select Category")) {
-                     Toast.makeText(UploadImage.this, "Please Select Catergory! ", Toast.LENGTH_SHORT).show();
-                 }else {
-                     progressDialog.setMessage("Uploading...");
-                     progressDialog.show();
-                     uploadImage();
-                 }
+        // Upload Image Button Click Listener
+        uploadImage.setOnClickListener(v -> {
+            if (bitmap == null) {
+                Toast.makeText(UploadImage.this, "Please Upload Image!", Toast.LENGTH_SHORT).show();
+            } else if (category.equals("Select Category")) {
+                Toast.makeText(UploadImage.this, "Please Select Category!", Toast.LENGTH_SHORT).show();
+            } else {
+                progressDialog.setMessage("Uploading...");
+                progressDialog.show();
+                uploadImage();
             }
         });
 
+        // Select Image CardView Click Listener
+        selectImage.setOnClickListener(v -> openGallery());
 
-
-        selectImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openGallery();
-            }
-        });
-
-
-
-
+        // Activity Result Launcher Initialization
         galleryLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                 Uri uri = result.getData().getData();
@@ -129,14 +121,10 @@ public class UploadImage extends AppCompatActivity {
                 }
             }
         });
-
-
-
     }
 
+    // Upload Image to Firebase Storage
     private void uploadImage() {
-
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
         byte[] imageData = baos.toByteArray();
@@ -146,7 +134,7 @@ public class UploadImage extends AppCompatActivity {
         uploadTask.addOnSuccessListener(taskSnapshot -> {
             filePath.getDownloadUrl().addOnSuccessListener(uri -> {
                 String downloadUrl = uri.toString();
-                uploadData(category,downloadUrl);
+                uploadData(category, downloadUrl);
             });
         }).addOnFailureListener(e -> {
             progressDialog.dismiss();
@@ -154,7 +142,7 @@ public class UploadImage extends AppCompatActivity {
         });
     }
 
-
+    // Upload Image Data to Firebase Database
     private void uploadData(String category, String downloadUrl) {
         String uniqueKey = databaseReference.push().getKey();
         if (uniqueKey == null) {
@@ -178,8 +166,21 @@ public class UploadImage extends AppCompatActivity {
                 });
     }
 
+    // Open Gallery to Select Image
     private void openGallery() {
         Intent pickImage = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         galleryLauncher.launch(pickImage);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+

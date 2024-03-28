@@ -1,8 +1,20 @@
 package com.example.admincollegeapp;
 
-public class NoticeData {
-    String title,date,time,image,key;
 
+
+
+
+public class NoticeData {
+
+    // Attributes
+    private String title;
+    private String date;
+    private String time;
+    private String image;
+    private String key;
+
+
+    // Constructors
     public NoticeData() {
     }
 
@@ -15,6 +27,7 @@ public class NoticeData {
     }
 
 
+    // Getters and setters
     public String getTitle() {
         return title;
     }
@@ -55,3 +68,8 @@ public class NoticeData {
         this.key = key;
     }
 }
+
+
+
+
+
