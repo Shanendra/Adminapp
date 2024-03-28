@@ -119,7 +119,7 @@ public class UploadNotice extends AppCompatActivity {
         String date = dateFormat.format(cal.getTime());
         String time = timeFormat.format(cal.getTime());
         NoticeData noticeData = new NoticeData(title, date, time, downloadUrl, uniqueKey);
-        databaseReference.child(uniqueKey).setValue(noticeData)
+        databaseReference.child(title).setValue(noticeData)
                 .addOnSuccessListener(aVoid -> {
                     progressDialog.dismiss();
                     Toast.makeText(UploadNotice.this, "Notice Uploaded!", Toast.LENGTH_SHORT).show();
