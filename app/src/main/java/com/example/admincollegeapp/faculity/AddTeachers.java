@@ -42,10 +42,11 @@ import java.util.Calendar;
     private ImageView addTeacherImage;
     private EditText addTeacherName, addTeacherEmail, addTeacherPost;
     private Spinner addTeacherCategory;
+     String downloadUrl;
     private String category;
     private String name, email, post, DowloadUrl = "";
     private Button addTeacherbtn;
-     private DatabaseReference databaseReference;
+     private DatabaseReference databaseReference,dbRef;
      private StorageReference storageReference;
      private ProgressDialog progressDialog;
     private ActivityResultLauncher<Intent> galleryLauncher;
@@ -66,8 +67,8 @@ import java.util.Calendar;
         addTeacherbtn = findViewById(R.id.addTeacherbtn);
 
         // Firebase Initialization
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("Gallery");
-        storageReference = FirebaseStorage.getInstance().getReference().child("Gallery");
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("Faculity");
+        storageReference = FirebaseStorage.getInstance().getReference().child("Faculity");
 
         // Progress Dialog Initialization
         progressDialog = new ProgressDialog(this);
@@ -164,7 +165,7 @@ import java.util.Calendar;
             uploadTask.addOnSuccessListener(taskSnapshot -> {
                 filePath.getDownloadUrl().addOnSuccessListener(uri -> {
                     String downloadUrl = uri.toString();
-                    uploadData(category, downloadUrl);
+                    uploadData();
                 });
             }).addOnFailureListener(e -> {
                 progressDialog.dismiss();
@@ -177,26 +178,23 @@ import java.util.Calendar;
 
 
         // Upload Image Data to Firebase Database
-        private void uploadData(String category, String downloadUrl) {
+        private void uploadData() {
+
             String uniqueKey = databaseReference.push().getKey();
             if (uniqueKey == null) {
                 Toast.makeText(this, "Failed to generate unique key", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy");
-            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
-            String date = dateFormat.format(cal.getTime());
-            String time = timeFormat.format(cal.getTime());
-            NoticeData noticeData = new NoticeData(category, date, time, downloadUrl, uniqueKey);
-            databaseReference.child(category).setValue(noticeData)
+
+            TeacherData TeacherData = new TeacherData(name,email,post,downloadUrl,uniqueKey);
+            databaseReference.child(category).setValue(TeacherData)
                     .addOnSuccessListener(aVoid -> {
                         progressDialog.dismiss();
-                        Toast.makeText(AddTeachers.this, "Image Uploaded!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddTeachers.this, "Faculity Added!", Toast.LENGTH_SHORT).show();
                     })
                     .addOnFailureListener(e -> {
                         progressDialog.dismiss();
-                        Toast.makeText(AddTeachers.this, "Failed to upload image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddTeachers.this, "Somethin Went Wrong!" + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         }
         
