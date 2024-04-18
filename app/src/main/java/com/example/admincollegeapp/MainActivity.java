@@ -6,16 +6,12 @@ import android.content.Intent;
 import android.widget.TextView;
 import android.os.Bundle;
 
+import com.example.admincollegeapp.faculity.UpdateFaculity;
 
 
+public class  MainActivity extends AppCompatActivity {
 
-
-
-
-
-public class MainActivity extends AppCompatActivity {
-
-    TextView textView, textupl, UploadPDF;
+    TextView textView, textupl, UploadPDF,UpdateFaculty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +22,13 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textUpload);
         textupl = findViewById(R.id.textuploadimg);
         UploadPDF = findViewById(R.id.UploadPDF);
+        UpdateFaculty = findViewById(R.id.Faculty);
 
         // Set onClick listeners for each TextView to launch respective activities
         UploadPDF.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), UploadPDFActivity.class)));
         textupl.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), UploadImage.class)));
         textView.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), UploadNotice.class)));
+        UpdateFaculty.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), UpdateFaculity.class)));
     }
 }
 
