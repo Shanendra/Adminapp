@@ -273,7 +273,7 @@
             android:layout_width="130dp"
             android:layout_height="150dp"
             android:layout_margin="10dp"
-            android:id="@+id/deleteNotice"
+
             android:elevation="5dp">
 
             <LinearLayout
@@ -298,6 +298,7 @@
 
 
                 <TextView
+                    android:id="@+id/deleteNotice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Delete Notice"

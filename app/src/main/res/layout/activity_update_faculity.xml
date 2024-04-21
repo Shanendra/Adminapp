@@ -6,6 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context=".faculity.UpdateFaculity">
 
 
@@ -24,12 +25,14 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="wrap_content" >
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+
+
             android:orientation="vertical">
 
             <TextView
@@ -49,7 +52,7 @@
                 android:background="#c1c1c1"/>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/BcaDepartment"
+                android:id="@+id/BCADepartment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
@@ -58,7 +61,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/BcaNodata">
+                android:id="@+id/BCANodata">
                 <include layout="@layout/no_data_found"/>
 
 
@@ -136,6 +139,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:id="@+id/BSCNodata">
                 <include layout="@layout/no_data_found"/>
 

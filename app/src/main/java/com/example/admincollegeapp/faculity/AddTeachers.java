@@ -19,13 +19,8 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.example.admincollegeapp.NoticeData;
 import com.example.admincollegeapp.R;
-import com.example.admincollegeapp.UploadImage;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -33,8 +28,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
  public class AddTeachers extends AppCompatActivity {
 
@@ -42,9 +35,9 @@ import java.util.Calendar;
     private ImageView addTeacherImage;
     private EditText addTeacherName, addTeacherEmail, addTeacherPost;
     private Spinner addTeacherCategory;
-     String downloadUrl;
+
     private String category;
-    private String name, email, post, DowloadUrl = "";
+    private String name, email, post, dowloadUrl = "";
     private Button addTeacherbtn;
      private DatabaseReference databaseReference,dbRef;
      private StorageReference storageReference;
@@ -68,14 +61,14 @@ import java.util.Calendar;
 
         // Firebase Initialization
         databaseReference = FirebaseDatabase.getInstance().getReference().child("Faculity");
-        storageReference = FirebaseStorage.getInstance().getReference().child("Faculity");
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         // Progress Dialog Initialization
         progressDialog = new ProgressDialog(this);
 
 
         // Spinner Initialization
-        String[] items = new String[]{"Select Department", "BCA", "BCOM", "BSC", "Other Department"};
+        String[] items = new String[]{"Select Category", "BCA", "BCOM", "BSC"};
         addTeacherCategory.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items));
 
         // Spinner Item Selected Listener
@@ -137,66 +130,95 @@ import java.util.Calendar;
         } else if (post.isEmpty()) {
             addTeacherPost.setError("Empty");
             addTeacherPost.requestFocus();
-        } else if (category.equals("Select Department")) {
-            Toast.makeText(this, "Please Select Faculity Department", Toast.LENGTH_SHORT).show();
+        } else if (category.equals("Select Category")) {
+            Toast.makeText(this, "Please Provide Category", Toast.LENGTH_SHORT).show();
         }else if (bitmap == null){
-            uploadImage();
-        }else {
-            uploadData();
-        }
-
-
-    }
-
-
-        // Upload Image to Firebase Storage
-        private void uploadImage() {
-
             progressDialog.setMessage("Uploading...");
             progressDialog.show();
 
+            uploadImage();
+        }else {
+            progressDialog.setMessage("Uploading...");
+            progressDialog.show();
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
-            byte[] imageData = baos.toByteArray();
-            String imageName = "image_" + System.currentTimeMillis() + ".jpg";
-            StorageReference filePath = storageReference.child(imageName);
-            UploadTask uploadTask = filePath.putBytes(imageData);
-            uploadTask.addOnSuccessListener(taskSnapshot -> {
-                filePath.getDownloadUrl().addOnSuccessListener(uri -> {
-                    String downloadUrl = uri.toString();
-                    uploadData();
-                });
-            }).addOnFailureListener(e -> {
-                progressDialog.dismiss();
-                Toast.makeText(AddTeachers.this, "Upload Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
+            uploadData(dowloadUrl);
         }
 
 
-
-
-
-        // Upload Image Data to Firebase Database
-        private void uploadData() {
-
-            String uniqueKey = databaseReference.push().getKey();
-            if (uniqueKey == null) {
-                Toast.makeText(this, "Failed to generate unique key", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            TeacherData TeacherData = new TeacherData(name,email,post,downloadUrl,uniqueKey);
-            databaseReference.child(category).setValue(TeacherData)
-                    .addOnSuccessListener(aVoid -> {
-                        progressDialog.dismiss();
-                        Toast.makeText(AddTeachers.this, "Faculity Added!", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        progressDialog.dismiss();
-                        Toast.makeText(AddTeachers.this, "Somethin Went Wrong!" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-        }
-        
     }
+
+
+
+
+
+
+
+
+     private void uploadImage() {
+         // Compress the bitmap
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+         byte[] imageData = baos.toByteArray();
+
+         // Generate a unique file name
+         String fileName = System.currentTimeMillis() + ".jpg";
+
+         // Create a reference to the Firebase Storage location
+         StorageReference imageRef = storageReference.child("Faculity").child(fileName);
+
+         // Upload the image data
+         UploadTask uploadTask = imageRef.putBytes(imageData);
+         uploadTask.addOnSuccessListener(taskSnapshot -> {
+             // Image upload successful, now get the download URL
+             imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                 // Get the download URL
+                 String downloadUrl = uri.toString();
+                 // Proceed to upload data with the download URL
+                 uploadData(downloadUrl);
+             }).addOnFailureListener(e -> {
+                 // Handle failure to get download URL
+                 progressDialog.dismiss();
+                 Toast.makeText(AddTeachers.this, "Failed to get download URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+             });
+         }).addOnFailureListener(e -> {
+             // Handle image upload failure
+             progressDialog.dismiss();
+             Toast.makeText(AddTeachers.this, "Upload Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+         });
+     }
+
+
+
+
+
+
+
+
+     private void uploadData(String downloadUrl) {
+         String uniqueKey = databaseReference.push().getKey();
+
+         if (uniqueKey == null) {
+             Toast.makeText(this, "Failed to generate unique key", Toast.LENGTH_SHORT).show();
+             return;
+         }
+
+         TeacherData teacherData = new TeacherData(name, email, post, downloadUrl, uniqueKey);
+
+         // Use the category (department) as the key under which the data will be stored
+         DatabaseReference departmentReference = databaseReference.child(category).child(uniqueKey);
+
+         departmentReference.setValue(teacherData)
+                 .addOnSuccessListener(aVoid -> {
+                     progressDialog.dismiss();
+                     Toast.makeText(AddTeachers.this, "Faculty Added!", Toast.LENGTH_SHORT).show();
+                 })
+                 .addOnFailureListener(e -> {
+                     progressDialog.dismiss();
+                     Toast.makeText(AddTeachers.this, "Something Went Wrong: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                 });
+     }
+
+
+
+ }
 
